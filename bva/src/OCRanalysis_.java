@@ -3,7 +3,7 @@ import ij.plugin.filter.PlugInFilter;
 import ij.process.*;
 import jdk.internal.util.xml.impl.Pair;
 
-import java.util.Vector;
+import java.util.*;
 
 
 public class OCRanalysis_ implements PlugInFilter {
@@ -66,8 +66,80 @@ public class OCRanalysis_ implements PlugInFilter {
         System.out.println(splittedCharacters.size());
 
         // let the user specify the target character
-        int tgtCharRow = 0;
-        int tgtCharCol = 4;
+        Map<Character, double[]> dictionary = new HashMap<>();
+
+        dictionary.put('a', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 5));
+        dictionary.put('b', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 39));
+        dictionary.put('c', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 9));
+        dictionary.put('d', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 26));
+        dictionary.put('e', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 22));
+        dictionary.put('f', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 4));
+        dictionary.put('g', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 7));
+        dictionary.put('h', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 10));
+        dictionary.put('i', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 18));
+        dictionary.put('j', getDoubles(featureVect, FG_VAL, splittedCharacters, 13, 0));
+        dictionary.put('k', getDoubles(featureVect, FG_VAL, splittedCharacters, 11, 17));
+        dictionary.put('l', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 22));
+        dictionary.put('m', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 19));
+        dictionary.put('n', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 3));
+        dictionary.put('o', getDoubles(featureVect, FG_VAL, splittedCharacters, 2, 1));
+        dictionary.put('p', getDoubles(featureVect, FG_VAL, splittedCharacters, 2, 5));
+        dictionary.put('r', getDoubles(featureVect, FG_VAL, splittedCharacters, 1, 6));
+        dictionary.put('s', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 8));
+        dictionary.put('t', getDoubles(featureVect, FG_VAL, splittedCharacters, 2, 2));
+        dictionary.put('u', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 11));
+
+        dictionary.put('A', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 2));
+        dictionary.put('B', getDoubles(featureVect, FG_VAL, splittedCharacters, 16, 00));
+        dictionary.put('I', getDoubles(featureVect, FG_VAL, splittedCharacters, 0, 0));
+        dictionary.put('G', getDoubles(featureVect, FG_VAL, splittedCharacters, 2, 0));
+        dictionary.put('H', getDoubles(featureVect, FG_VAL, splittedCharacters, 10, 0));
+        dictionary.put('W', getDoubles(featureVect, FG_VAL, splittedCharacters, 7, 0));
+
+        dictionary.put('U', getDoubles(featureVect, FG_VAL, splittedCharacters, 1, 20));
+        dictionary.put('N', getDoubles(featureVect, FG_VAL, splittedCharacters, 4, 24));
+        dictionary.put('Z', getDoubles(featureVect, FG_VAL, splittedCharacters, 19, 20));
+
+        dictionary.put('J', getDoubles(featureVect, FG_VAL, splittedCharacters, 20, 7));
+        dictionary.put('T', getDoubles(featureVect, FG_VAL, splittedCharacters, 20, 0));
+
+
+        for (Map.Entry<Character, double[]> featureResArr : dictionary.entrySet()) {
+            //get min/max for each feature and all possible letters ==> use for normalization of vector array
+            //==> [0;1]
+            //==> required for normalization
+            int index = 0;
+            Vector<double[]> normArr = calculateNormArr(splittedCharacters, FG_VAL, featureVect);
+            for (double[] minMaxArr : normArr) {
+                System.out.println("FEATURE IDX\t" + featureVect.get(index).description + "\tmin\t" + minMaxArr[0] + "\tmax\t" + minMaxArr[1]);
+                index++;
+            }
+
+            int hitCount = 0; //count the number of detected characters
+
+            for (Vector<SubImageRegion> row : splittedCharacters) {
+                for (SubImageRegion letter : row) {
+                    System.out.println(letter);
+
+                    double[] test = calcFeatureArr(letter, FG_VAL, featureVect);
+
+                    if (isMatchingChar(test, featureResArr.getValue(), normArr)) {
+                        hitCount++;
+
+                        binaryImgArr = markRegionInImage(binaryImgArr, letter, FG_VAL, MARKER_VAL);
+                    }
+                }
+            }
+
+            IJ.log("# of letters detected = " + hitCount);
+        }
+
+
+        ImageJUtility.showNewImage(binaryImgArr, width, height, "result image with marked letters");
+
+    } //run
+
+    private double[] getDoubles(Vector<ImageFeatureBase> featureVect, int FG_VAL, Vector<Vector<SubImageRegion>> splittedCharacters, int tgtCharRow, int tgtCharCol) {
         SubImageRegion charROI = splittedCharacters.get(tgtCharRow).get(tgtCharCol);
 
         ImageJUtility.showNewImage(charROI.subImgArr, charROI.width, charROI.height, "char at pos " + tgtCharRow + " / " + tgtCharCol);
@@ -75,38 +147,8 @@ public class OCRanalysis_ implements PlugInFilter {
         //calculate features of reference character
         double[] featureResArr = calcFeatureArr(charROI, FG_VAL, featureVect);
         printoutFeatureRes(featureResArr, featureVect);
-
-        //get min/max for each feature and all possible letters ==> use for normalization of vector array
-        //==> [0;1]
-        //==> required for normalization
-        int index = 0;
-        Vector<double[]> normArr = calculateNormArr(splittedCharacters, FG_VAL, featureVect);
-        for (double[] minMaxArr : normArr) {
-            System.out.println("FEATURE IDX\t" + featureVect.get(index).description + "\tmin\t" + minMaxArr[0] + "\tmax\t" + minMaxArr[1]);
-            index++;
-        }
-
-        int hitCount = 0; //count the number of detected characters
-
-        for (Vector<SubImageRegion> row : splittedCharacters) {
-            for (SubImageRegion letter : row) {
-                System.out.println(letter);
-
-                double[] test = calcFeatureArr(letter, FG_VAL, featureVect);
-
-                if (isMatchingChar(test, featureResArr, normArr)) {
-                    hitCount++;
-
-                    binaryImgArr = markRegionInImage(binaryImgArr, letter, FG_VAL, MARKER_VAL);
-                }
-            }
-        }
-
-        IJ.log("# of letters detected = " + hitCount);
-
-        ImageJUtility.showNewImage(binaryImgArr, width, height, "result image with marked letters");
-
-    } //run
+        return featureResArr;
+    }
 
     public int[][] markRegionInImage(int[][] inImgArr, SubImageRegion imgRegion, int colorToReplace, int tgtColor) {
 
@@ -144,8 +186,8 @@ public class OCRanalysis_ implements PlugInFilter {
         //         return false;
         // }
 
-        // the value 0.0169 was manually tested
-        return !(matchValue > 0.0169);
+        // the value 0.0175 was manually tested
+        return !(matchValue > 0.0175);
     }
 
 
