@@ -32,13 +32,10 @@ public class OCRanalysis_ implements PlugInFilter {
 
     public void run(ImageProcessor ip) {
         Vector<ImageFeatureBase> featureVect = new Vector<ImageFeatureBase>();
-        featureVect.add(new ImageFeatureF_FGcount());
+        featureVect.add(new ImageFeature_FGcount());
         featureVect.add(new ImageFeature_MaxDistX());
         featureVect.add(new ImageFeature_MaxDistY());
         featureVect.add(new ImageFeature_AvgDistanceCentroid());
-
-        //TODO: build up feature vector
-
 
         byte[] pixels = (byte[])ip.getPixels();
         int width = ip.getWidth();
@@ -66,24 +63,25 @@ public class OCRanalysis_ implements PlugInFilter {
         Vector<Vector<SubImageRegion>> splittedCharacters = splitCharacters(binaryImgArr, width, height, BG_VAL, FG_VAL);
         System.out.println(splittedCharacters.size());
 
-        //TODO: let the user specify the target character
+        // let the user specify the target character
         int tgtCharRow = 0;
         int tgtCharCol = 4;
         SubImageRegion charROI = splittedCharacters.get(tgtCharRow).get(tgtCharCol);
+
         ImageJUtility.showNewImage(charROI.subImgArr, charROI.width, charROI.height, "char at pos " + tgtCharRow + " / " + tgtCharCol);
 
         //calculate features of reference character
-        double[] featureResArr = calcFeatureArr(charROI, BG_VAL, featureVect);
+        double[] featureResArr = calcFeatureArr(charROI, FG_VAL, featureVect);
         printoutFeatureRes(featureResArr, featureVect);
 
         //get min / max
-        Vector<double[]> allFeatureMinMax = calculateNormArr(splittedCharacters, FG_VAL, featureVect);
-        int index = 0;
+        //Vector<double[]> allFeatureMinMax = calculateNormArr(splittedCharacters, FG_VAL, featureVect);
+        //int index = 0;
 
-        for (double[] minMaxArr: allFeatureMinMax) {
-            System.out.println("FEATURE IDX\t" + index + "min\t" + minMaxArr[0] + "max\t" + minMaxArr[1]);
-            index++;
-        }
+        //for (double[] minMaxArr: allFeatureMinMax) {
+        //    System.out.println("FEATURE IDX\t" + featureVect.get(index).description + "\tmin\t" + minMaxArr[0] + "\tmax\t" + minMaxArr[1]);
+        //    index++;
+        //}
 
 
 
@@ -91,14 +89,29 @@ public class OCRanalysis_ implements PlugInFilter {
         //get min/max for each feature and all possible letters ==> use for normalization of vector array
         //==> [0;1]
         //==> required for normalization
-        //double[] normArr = calculateNormArr(splittedCharacters, BG_VAL, featureVect);
-        //printoutFeatureRes(normArr, featureVect);
+        int index = 0;
+        Vector<double[]> normArr = calculateNormArr(splittedCharacters, FG_VAL, featureVect);
+        for (double[] minMaxArr: normArr) {
+            System.out.println("FEATURE IDX\t" + featureVect.get(index).description + "\tmin\t" + minMaxArr[0] + "\tmax\t" + minMaxArr[1]);
+            index++;
+        }
 
         int hitCount = 0; //count the number of detected characters
 
-        //TODO: now detect all matching characters
-        //forall SubImageRegion sir in splittedCharacters
-        //if isMatchingChar(..,sir,..) then markRegionInImage(..,sir,..)
+        for(Vector<SubImageRegion> row : splittedCharacters)
+        {
+            for(SubImageRegion letter : row)
+            {
+                System.out.println(letter);
+
+                double[] test = calcFeatureArr(letter, FG_VAL, featureVect);
+
+                if(isMatchingChar(test, featureResArr, normArr))
+                {
+                    hitCount++;
+                }
+            }
+        }
 
 
         IJ.log("# of letters detected = " + hitCount);
@@ -115,16 +128,23 @@ public class OCRanalysis_ implements PlugInFilter {
     boolean isMatchingChar(double[] currFeatureArr, double[] refFeatureArr, Vector<double[]> normFeatureArr) {
         double CORR_COEFFICIENT_LIMIT = -1;//?;
 
-        //TODO: implementation required
+        ////TODO: implementation required
+        //for(int i = 0; i < currFeatureArr.length; i++)
+        //{
+        //    double normalizedF = (currFeatureArr[i] - normFeatureArr.get(i)[0]) / (normFeatureArr.get(0)[1] - normFeatureArr.get(i)[0]);
+        //    System.out.println();
+        //    //double
+        //}
+
         for(int i = 0; i < currFeatureArr.length; i++)
         {
-            double normalizedF = (currFeatureArr[i] - normFeatureArr.get(i)[0]) / (normFeatureArr.get(0)[1] - normFeatureArr.get(i)[0]);
-
-            //double
+            if(currFeatureArr[i] != refFeatureArr[i])
+            {
+                return false;
+            }
         }
 
-
-        return false;
+        return true;
     }
 
 
@@ -175,6 +195,7 @@ public class OCRanalysis_ implements PlugInFilter {
 
             resArrMinMax[0] = minValue;
             resArrMinMax[1] = maxValue;
+
             returnVec.add(resArrMinMax);
         }
 
@@ -278,7 +299,7 @@ public class OCRanalysis_ implements PlugInFilter {
     //the features to implement
 
 
-
+    /*
     class ImageFeatureF_FGcount extends ImageFeatureBase {
 
         public ImageFeatureF_FGcount() {
@@ -383,6 +404,7 @@ public class OCRanalysis_ implements PlugInFilter {
         }
 
     }
+    */
 
     public abstract class ImageFeatureBase {
 
@@ -391,13 +413,6 @@ public class OCRanalysis_ implements PlugInFilter {
         public abstract double CalcFeatureVal(SubImageRegion imgRegion, int FG_val);
 
     }
-
-    /*
-        public static int F_FGcount = 0;
-    public static int F_MaxDistX= 1;
-    public static int F_MaxDistY= 2;
-    public static int F_AvgDistanceCentroide= 3;
-     */
 
     public class ImageFeature_FGcount extends ImageFeatureBase {
 
