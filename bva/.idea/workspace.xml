@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="522f7839-43ea-412f-ac57-cbde656bddfa" name="Default Changelist" comment="added colorization of letters">
+      <change afterPath="$PROJECT_DIR$/src/AnisotropicDiffusionTemplate_.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/RLDeconvolution_.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OCRanalysis_.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OCRanalysis_.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,6 +16,13 @@
   </component>
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -41,11 +49,15 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Downloaded.Files.Path.Enabled": "false",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/Git/ImageJDevBVA/bva",
+    "last_opened_file_path": "D:/Git/ImageJDevBVA/bva/src",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "settings.editor.selected.configurable": "actions.on.save"
@@ -53,6 +65,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Git\ImageJDevBVA\bva\src" />
       <recent name="C:\Public\git\bva\src" />
       <recent name="C:\public\ImageJDevProject\src" />
     </key>
@@ -140,7 +153,9 @@
       <workItem from="1650533062226" duration="1872000" />
       <workItem from="1650614080673" duration="15000" />
       <workItem from="1650712220604" duration="82000" />
-      <workItem from="1650712494124" duration="13706000" />
+      <workItem from="1650712494124" duration="14459000" />
+      <workItem from="1650808028886" duration="66000" />
+      <workItem from="1651425500441" duration="6122000" />
     </task>
     <task id="LOCAL-00001" summary="added working version">
       <created>1650716799624</created>
@@ -156,7 +171,14 @@
       <option name="project" value="LOCAL" />
       <updated>1650721385883</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added colorization of letters">
+      <created>1650738146310</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1650738146310</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,6 +199,17 @@
     <MESSAGE value="added working version" />
     <MESSAGE value="added colorization of letters" />
     <option name="LAST_COMMIT_MESSAGE" value="added colorization of letters" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/AnisotropicDiffusionTemplate_.java</url>
+          <line>144</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
